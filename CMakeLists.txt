@@ -21,6 +21,7 @@ set(_common
     xAODRootAccess
     xAODJet
     xAODTruth
+    xAODEventInfo
 )
 
 

@@ -66,6 +66,41 @@ static bool IsDF( const xAOD::TruthParticle* l0, const xAOD::TruthParticle* l1 )
     return ( IsEM(l0,l1) || IsME(l0,l1) );
 }
 
+struct Histo
+{
+    Histo() :
+        name(""),
+        title(""),
+        nbinsX(0),
+        lowX(0),
+        highX(0),
+        nbinsY(0),
+        lowY(0),
+        highY(0) {}
+    Histo(std::string name = "", std::string title = "",
+        int nbinsX = 0, double lowX = 0, double highX = 0,
+        int nbinsY = 0, double lowY = 0, double highY = 0) :
+        name(name),
+        title(title),
+        nbinsX(nbinsX),
+        lowX(lowX),
+        highX(highX),
+        nbinsY(nbinsY),
+        lowY(lowY),
+        highY(highY) {}
+
+    std::string name;
+    std::string title;
+    int nbinsX;
+    double lowX;
+    double highX;
+    int nbinsY;
+    double lowY;
+    double highY;
+
+    bool is2D() { return nbinsY != 0; }
+};
+
 
 } // namespace
 

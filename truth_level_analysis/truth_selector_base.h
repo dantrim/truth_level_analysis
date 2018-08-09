@@ -5,10 +5,15 @@
 #include "TSelector.h"
 #include "TFile.h"
 #include "TStopwatch.h"
+class TH1F;
+class TH1D;
+class TH2F;
+class TH2D;
 
 //std/stl
 #include <string>
 #include <vector>
+#include <map>
 
 //analysis
 #include "truth_level_analysis/helpers.h"
@@ -55,12 +60,16 @@ class TruthSelectorBase : public TSelector
         void set_suffix(std::string val) { m_suffix = val; }
         std::string suffix() { return m_suffix; }
 
+        void set_output_dir(std::string val) { m_outdir = val; }
+        std::string output_dir() { return m_outdir; }
+
         void set_input_samplename(std::string name) { m_input_samplename = name; }
         void set_output_filename(std::string name) { m_output_filename = name; }
         std::string input_samplename() { return m_input_samplename; }
         std::string output_filename() { return m_output_filename; } 
 
         void save_output();
+        void save_histograms(TFile* file);
 
         TStopwatch* timer() { return &m_timer; }
         std::string timer_summary();
@@ -73,10 +82,16 @@ class TruthSelectorBase : public TSelector
         TFile* output_file() { return m_output_tree_file; }
         TTree* output_tree() { return m_output_tree; }
 
+        // MC
+        std::vector<std::string> loaded_histos() { return m_loaded_histos; }
+        void mc_weight(double w) { m_mc_weight = w; }
+        double mc_weight() { return m_mc_weight; }
+
     protected :
 
         int m_dbg;
         std::string m_suffix;
+        std::string m_outdir;
 
         int n_evt_processed;
         int n_evt_stored;
@@ -91,6 +106,15 @@ class TruthSelectorBase : public TSelector
 
         std::string m_input_samplename;
         std::string m_output_filename;
+
+        double m_mc_weight;
+
+        std::vector<std::string> m_loaded_histos;
+        std::map<std::string, TH1D*> m_histo_map1D;
+        std::map<std::string, TH2D*> m_histo_map2D;
+        void add_histogram(truth::Histo descriptor);
+        void fill_histo(std::string name, double x);
+        void fill_histo(std::string name, double x, double  y);
 
     //ClassDef(TruthSelectorBase, 0);
 

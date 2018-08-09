@@ -8,6 +8,7 @@
 
 //boost
 #include <boost/program_options.hpp>
+#include <boost/filesystem.hpp>
 
 //std/stl
 #include <string>
@@ -29,6 +30,7 @@ void help()
 int main(int argc, char** argv)
 {
     string input_file = "";
+    string output_dir = "./";
     int dbg_level = 0;
     string suffix = "";
     int n_entries = -1;
@@ -41,6 +43,9 @@ int main(int argc, char** argv)
         ("input,i",
             po::value(&input_file),
             "input file [DAOD, text file, or directory of files]")
+        ("outdir,o",
+            po::value(&output_dir)->default_value("./"),
+            "output directory to dump any produced files")
         ("nentries,n",
             po::value(&n_entries)->default_value(-1),
             "provide number of entries to process")
@@ -56,7 +61,7 @@ int main(int argc, char** argv)
     po::notify(vm);
 
     if(vm.count("help")) {
-        cout << desc << endl;
+        cerr << desc << endl;
 //        help();
         exit(0);
     }
@@ -65,7 +70,19 @@ int main(int argc, char** argv)
         cout << "input file : " << input_file << endl;
     }
     else {
-        cout << "ERROR: you did not provide an input file" << endl;
+        cerr << "ERROR: you did not provide an input file" << endl;
+        exit(1);
+    }
+
+    boost::filesystem::path path(output_dir);
+    if(boost::filesystem::exists(path)) {
+        if(!boost::filesystem::is_directory(path)) {
+            cerr << "ERROR: provided output directory (=" << output_dir << ") is not a directory" << endl;
+            exit(1);
+        }
+    }
+    else {
+        cerr << "ERROR: provided output directory (=" << output_dir << ") does not exist" << endl;
         exit(1);
     }
 
@@ -81,6 +98,7 @@ int main(int argc, char** argv)
     // setup the looper
     truth::HHTruthValidation* looper = new truth::HHTruthValidation();
     looper->set_debug_level(dbg_level);
+    looper->set_output_dir(output_dir);
     looper->set_input_samplename(input_file);
     looper->set_suffix(suffix);
     chain->Process(looper, input_file.c_str(), n_entries);

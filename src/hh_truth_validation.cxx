@@ -14,6 +14,7 @@ using namespace std;
 #include "TFile.h"
 
 //xAOD
+#include "xAODEventInfo/EventInfo.h"
 
 namespace truth
 {
@@ -32,12 +33,14 @@ void HHTruthValidation::SlaveBegin(TTree* /*tree*/)
 void HHTruthValidation::Terminate()
 {
     TruthSelectorBase::Terminate();
+    save_histograms(m_rfile);
 }
 
 void HHTruthValidation::setup_output()
 {
     stringstream ofn;
-    ofn << "hh_validation";
+    // assume that the output directory has already been tested for existence
+    ofn << output_dir() << "/" << "hh_validation";
     if(suffix()!="") ofn << "_" << suffix();
     ofn << ".root";
     cout << MYFUNC << " setting up output file (name = " << ofn.str() << ")" << endl;
@@ -47,7 +50,11 @@ void HHTruthValidation::setup_output()
         exit(1);
     }
     m_rfile->cd();
+}
 
+void HHTruthValidation::setup_histograms()
+{
+    add_histogram(Histo("l0_pt", ";Lead lepton p_{T} [GeV]", 100, 0, -1));
 }
 
 Bool_t HHTruthValidation::Process(Long64_t entry)
@@ -58,7 +65,9 @@ Bool_t HHTruthValidation::Process(Long64_t entry)
 
     if(chain_entry == 0) {
         setup_output();
+        setup_histograms();
     }
+
 
     // let's just build up the collections here
 
@@ -76,6 +85,13 @@ Bool_t HHTruthValidation::Process(Long64_t entry)
 
     const xAOD::TruthVertexContainer* truthVertices = 0;
     RETURN_CHECK(GetName(), event()->retrieve(truthVertices, "TruthVertices"));
+
+    // set the MC weight
+    mc_weight(ei->mcEventWeight());
+
+    for(const auto & p : *truthElectrons) {
+        fill_histo("l0_pt", p->pt() * mev2gev);
+    }
 
     return true;
 }

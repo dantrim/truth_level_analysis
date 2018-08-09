@@ -31,9 +31,7 @@ class HHTruthValidation : public TruthSelectorBase
 
         // setup our output file and histograms
         void setup_output();
-
-        // analysis
-        double w() { return m_mc_weight; }
+        void setup_histograms();
 
         // override the TSelector methods 
         void SlaveBegin(TTree* tree);
@@ -44,7 +42,6 @@ class HHTruthValidation : public TruthSelectorBase
 
         double m_mc_weight;
 
-        std::string m_suffix;
         std::string m_outfilename;
 
         // ROOT

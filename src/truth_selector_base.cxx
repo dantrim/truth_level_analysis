@@ -15,6 +15,10 @@ using namespace std;
 #include "TROOT.h"
 #include "TChain.h"
 #include "TTree.h"
+#include "TH1F.h"
+#include "TH2F.h"
+#include "TH1D.h"
+#include "TH2D.h"
 
 //ClassImp(truth::TruthSelectorBase)
 
@@ -24,11 +28,13 @@ namespace truth
 TruthSelectorBase::TruthSelectorBase() :
     m_dbg(0),
     m_suffix(""),
+    m_outdir("./"),
     n_evt_processed(0),
     n_evt_stored(0),
     m_output_tree_file(nullptr),
     m_output_tree(nullptr),
-    m_tree(nullptr)
+    m_tree(nullptr),
+    m_mc_weight(1.0)
 //    m_event(new xAOD::TEvent(xAOD::TEvent::kClassAccess)
     //m_tstore(new xAOD::TStore),
 {
@@ -99,6 +105,66 @@ void TruthSelectorBase::save_output()
     m_output_tree->Write(0, TObject::kOverwrite);
     cout << MYFUNC << " Output tree saved to : " << m_output_tree_file->GetName() << endl;
     m_output_tree_file->Close();
+}
+
+void TruthSelectorBase::add_histogram(truth::Histo desc)
+{
+    if(desc.is2D()) {
+        if(m_histo_map2D.count(desc.name) != 0) {
+            cout << MYFUNC << " 2D histogram (name=" << desc.name << ") already loaded" << endl;
+        }
+        else {
+            TH2D* h = new TH2D( desc.name.c_str(), desc.title.c_str(), desc.nbinsX, desc.lowX, desc.highX, desc.nbinsY, desc.lowY, desc.highY);
+            m_histo_map2D[desc.name] = h;
+            m_loaded_histos.push_back(desc.name);
+        }
+    }
+    else if(!desc.is2D()) {
+        if(m_histo_map1D.count(desc.name) != 0) {
+            cout << MYFUNC << " 1D histogram (name=" << desc.name << ") already loaded" << endl;
+        }
+        else {
+            TH1D* h = new TH1D( desc.name.c_str(), desc.title.c_str(), desc.nbinsX, desc.lowX, desc.highX );
+            m_histo_map1D[desc.name] = h;
+            m_loaded_histos.push_back(desc.name);
+        }
+    }
+}
+
+void TruthSelectorBase::fill_histo(string name, double x)
+{
+    if(m_histo_map1D.count(name) == 0) {
+        cerr << MYFUNC << " ERROR attempting to fill unknown histogram (name=" << name << ")" << endl;
+        exit(1);
+    }
+    m_histo_map1D[name]->Fill(x, mc_weight());
+}
+
+void TruthSelectorBase::fill_histo(string name, double x, double y)
+{
+    if(m_histo_map2D.count(name) == 0) {
+        cerr << MYFUNC << " ERROR attempting to fill unknown histogram (name=" << name << ")" << endl;
+        exit(1);
+    }
+    m_histo_map2D[name]->Fill(x,y,mc_weight());
+}
+
+void TruthSelectorBase::save_histograms(TFile* output_file)
+{
+    if(output_file != nullptr) {
+        output_file->cd();
+        for(auto name : loaded_histos()) {
+            if(m_histo_map1D.count(name)) {
+                m_histo_map1D[name]->Write();
+            }
+            else if(m_histo_map2D.count(name)) {
+                m_histo_map2D[name]->Write(); 
+            }
+        }
+    }
+    else {
+        cerr << MYFUNC << " ERROR could not write histograms to requested output" << endl;
+    }
 }
 
 std::string TruthSelectorBase::timer_summary()
