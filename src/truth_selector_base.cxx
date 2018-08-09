@@ -23,6 +23,7 @@ namespace truth
 
 TruthSelectorBase::TruthSelectorBase() :
     m_dbg(0),
+    m_suffix(""),
     n_evt_processed(0),
     n_evt_stored(0),
     m_output_tree_file(nullptr),

@@ -20,7 +20,6 @@ namespace truth
 
 HHTruthValidation::HHTruthValidation() :
     m_mc_weight(1.0),
-    m_suffix(""),
     m_outfilename("")
 {
 }

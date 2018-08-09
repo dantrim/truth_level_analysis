@@ -52,6 +52,9 @@ class TruthSelectorBase : public TSelector
         void set_debug_level(int dbg_level) { m_dbg = dbg_level; }
         int debug_level() { return m_dbg; }
 
+        void set_suffix(std::string val) { m_suffix = val; }
+        std::string suffix() { return m_suffix; }
+
         void set_input_samplename(std::string name) { m_input_samplename = name; }
         void set_output_filename(std::string name) { m_output_filename = name; }
         std::string input_samplename() { return m_input_samplename; }
@@ -73,6 +76,7 @@ class TruthSelectorBase : public TSelector
     protected :
 
         int m_dbg;
+        std::string m_suffix;
 
         int n_evt_processed;
         int n_evt_stored;
