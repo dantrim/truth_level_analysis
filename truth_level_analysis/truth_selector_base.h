@@ -23,6 +23,10 @@ class TH2D;
 #include "xAODEventInfo/EventInfo.h"
 #include "xAODRootAccess/TEvent.h"
 #include "xAODTruth/TruthEventContainer.h"
+namespace xAOD {
+    class TEvent;
+    class TStore;
+}
 
 #undef CHECK
 #define CHECK( ARG ) \

@@ -6,11 +6,11 @@
 
 //xAOD
 #include "xAODTruth/TruthParticleContainer.h"
+#include "xAODJet/Jet.h"
 
-namespace xAOD {
-    class TEvent;
-    class TStore;
-}
+//ROOT
+#include "TLorentzVector.h"
+
 
 namespace truth
 {
@@ -66,6 +66,21 @@ static bool IsDF( const xAOD::TruthParticle* l0, const xAOD::TruthParticle* l1 )
     return ( IsEM(l0,l1) || IsME(l0,l1) );
 }
 
+struct pt_greater {
+    bool operator() (const xAOD::TruthParticle* a, const xAOD::TruthParticle* b) { return a->pt() > b->pt(); }
+};
+static pt_greater PtGreater;
+
+struct pt_greaterTLV {
+    bool operator() (const TLorentzVector& a, const TLorentzVector& b) { return a.Pt() > b.Pt(); }
+};
+static pt_greaterTLV PtGreaterTLV;
+
+struct pt_greaterJet {
+    bool operator() (const xAOD::Jet* a, const xAOD::Jet* b) { return a->pt() > b->pt(); }
+};
+static pt_greaterJet PtGreaterJet;
+
 struct Histo
 {
     Histo() :
@@ -100,6 +115,42 @@ struct Histo
 
     bool is2D() { return nbinsY != 0; }
 };
+
+enum DileptonFlavor {
+    EE=0,
+    MM,
+    TT,
+    EM,
+    ME,
+    TE,
+    ET,
+    TM,
+    MT,
+    SF,
+    Invalid
+};
+
+static DileptonFlavor get_dilepton_flavor(const xAOD::TruthParticle* l0, const xAOD::TruthParticle* l1) {
+
+    bool e0 = l0->isElectron();
+    bool m0 = l0->isMuon();
+    bool t0 = l0->isTau();
+    bool e1 = l1->isElectron();
+    bool m1 = l1->isMuon();
+    bool t1 = l1->isTau();
+
+    if(e0 && e1) return DileptonFlavor::EE;
+    else if(e0 && m1) return DileptonFlavor::EM;
+    else if(e0 && t1) return DileptonFlavor::ET;
+    else if(m0 && m1) return DileptonFlavor::MM;
+    else if(m0 && e1) return DileptonFlavor::ME;
+    else if(m0 && t1) return DileptonFlavor::MT;
+    else if(t0 && t1) return DileptonFlavor::TT;
+    else if(t0 && e1) return DileptonFlavor::TE;
+    else if(t0 && m1) return DileptonFlavor::TM;
+    else
+        return DileptonFlavor::Invalid;
+}
 
 
 } // namespace

@@ -22,6 +22,7 @@ set(_common
     xAODJet
     xAODTruth
     xAODEventInfo
+    xAODMissingET
 )
 
 
