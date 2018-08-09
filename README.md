@@ -20,8 +20,14 @@ make -j
 source x86_64*/setup.sh
 run_truth_test
 ```
-
 In reality, replace the executable `run_truth_test` with the one you want.
+
+# Structure
+The C++ header (re:**\*.h**) files are located in the directory *truth_level_analysis/*.
+The C++ source (re:**\*.cxx**) files are located in *src/*. Main applications/executables
+are locatedin *util/*. The `CMakeLists.txt` file will pick up any file in these directories
+and will build an executable out of any main application in *util/*, there is no need to
+explicitly add it.
 
 # Current Goings On
 
