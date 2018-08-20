@@ -89,8 +89,8 @@ void HHTruthValidation::setup_histograms()
 
     // histograms from final sate objects
     add_histogram(Histo("h_fs_raw_nLeptons", ";(Raw) Number of leptons (e/#mu)", 6, 0, 6));
-    add_histogram(Histo("h_fs_raw_l0_pt", ";(Raw) Leading lepton p_{T} [GeV]", 150, 0, 150));
-    add_histogram(Histo("h_fs_raw_l1_pt", ";(Raw) Sub-leading lepton p_{T} [GeV]", 100, 0, 100));
+    add_histogram(Histo("h_fs_raw_l0_pt", ";(Raw) Leading lepton p_{T} [GeV]", 100, 0, 200));
+    add_histogram(Histo("h_fs_raw_l1_pt", ";(Raw) Sub-leading lepton p_{T} [GeV]", 50, 0, 100));
     add_histogram(Histo("h_fs_raw_l0_eta", ";(Raw) Leading lepton #eta", 320, -3.0, 3.0));
     add_histogram(Histo("h_fs_raw_l1_eta", ";(Raw) Sub-leading lepton #eta", 320, -3, 3));
     add_histogram(Histo("h_fs_raw_l0_parent", ";(Raw) Leading lepton parent pdgId", 100, 0, 100));
