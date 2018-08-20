@@ -29,10 +29,16 @@ class TtMetTruthValidation : public TruthSelectorBase
         void Terminate();
         virtual Bool_t Process(Long64_t entry);
 
+        void setup_output();
+        void setup_histograms();
+
+        bool process_stop_decays();
+
     private :
 
         double m_mc_weight;
         std::string m_outfilename;
+        TFile* m_rfile;
 
 
 }; // class TtMetTruthValidation
