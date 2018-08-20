@@ -36,3 +36,4 @@ Here is a listing of the current analysis loopers that can process input TRUTH D
 |Executable| Looper Class (source) | Purpose|
 |----------|-----------------------|--------|
 |run_hh_validation | HHTruthValidation (hh_truth_validation) | Process HH signal samples and make generator/filter validation histograms |
+|run_ttmet_validation| TtMetTruthValidation (ttmet_truth_vadliation) | Process 2L tt+MET signal samples and make generator/filter validation histograms |
