@@ -5,7 +5,7 @@ Analysis code for processing the ATLAS TRUTHX data format
 Be on a machine with access to `/cvmfs/`.
 
 # Expectation
-This code likes to run over **TRUTH1** format.
+This code likes to run over **TRUTH1** format. Get out of here with that **TRUTH3** racket.
 
 # Building and Running
 ```bash
