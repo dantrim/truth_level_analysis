@@ -5,7 +5,7 @@ Analysis code for processing the ATLAS TRUTHX data format
 Be on a machine with access to `/cvmfs/`.
 
 # Expectation
-This code likes to run over **TRUTH1** format.
+This code likes to run over **TRUTH1** format. Get out of here with that **TRUTH3** racket.
 
 # Building and Running
 ```bash
@@ -36,3 +36,4 @@ Here is a listing of the current analysis loopers that can process input TRUTH D
 |Executable| Looper Class (source) | Purpose|
 |----------|-----------------------|--------|
 |run_hh_validation | HHTruthValidation (hh_truth_validation) | Process HH signal samples and make generator/filter validation histograms |
+|run_ttmet_validation| TtMetTruthValidation (ttmet_truth_vadliation) | Process 2L tt+MET signal samples and make generator/filter validation histograms |
