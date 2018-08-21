@@ -31,7 +31,7 @@ def dump_histograms(input_filename) :
         c.cd()
         obj.SetLineColor(r.kBlack)
         obj.SetMinimum(0)
-        obj.Draw("hist")
+        obj.Draw("hist e")
         c.Update()
         c.SaveAs("./plots/histo_%s_%s.pdf" % (obj.GetName().replace("h_",""), suffix))
 
@@ -91,6 +91,8 @@ def dump_ratio_histograms(inputs, histo_names) :
     r.gStyle.SetOptStat(False)
 
     suffixes = [ n.split("_")[-1].replace(".root","") for n in inputs ]
+    colors = [r.kBlack, r.kRed]
+    print "suffixes = %s" % suffixes
 
     histograms = {}
     for name in histo_names :
@@ -104,22 +106,22 @@ def dump_ratio_histograms(inputs, histo_names) :
 
     for name in histo_names :
         title = name.replace("h_","")
-        print " > ratio %s" % title
         c = RatioCanvas(title)
         c.canvas.cd()
         c.upper_pad.cd()
+        c.upper_pad.SetTicks(1,1)
+        c.upper_pad.SetLogy(True)
         dont_draw = False
 
         val_to_scale = -1
         maxy = -1
 
-        colors = [r.kBlack, r.kRed]
+
         for ih, histo in enumerate(histograms[name]) :
             if not histo : break
             if histo.Integral() == 0 :
                 dont_draw = True
                 break
-            print "   x --> %d" % histo.GetNbinsX()
             histo.SetLineWidth(2)
             histo.SetLineColor(colors[ih])
             histo.Scale(1/histo.Integral())
@@ -129,8 +131,9 @@ def dump_ratio_histograms(inputs, histo_names) :
                 val_to_scale = histo.Integral() / val_to_scale
             histo.Scale(1/val_to_scale)
 
-            if histo.GetMaximum() > maxy :
-                maxy = histo.GetMaximum()
+
+            #if histo.GetMaximum() > maxy :
+            #    maxy = histo.GetMaximum()
             #histo.SetMaximum(0.4)
 
             yax = histo.GetYaxis()
@@ -140,8 +143,10 @@ def dump_ratio_histograms(inputs, histo_names) :
             yax.SetTitleOffset(1.5)
             xax.SetTitleOffset(100)
             xax.SetLabelOffset(100)
-            option = "hist"
+            option = "hist e"
             if ih != 0 : option += " same"
+
+            #leg.AddEntry(histo, suffixes[ih], "l")
             histo.Draw(option)
             c.canvas.Update()
 
@@ -149,23 +154,32 @@ def dump_ratio_histograms(inputs, histo_names) :
             continue
 
         c.lower_pad.cd()
-        for name in histograms :
+        c.lower_pad.SetTicks(1,1)
 
-            hratio = histograms[name][1].Clone("ratio_%s" % histograms[name][0].GetName())
-            hratio.Divide(histograms[name][0])
-            hratio.SetLineColor(colors[1])
-            hratio.SetMinimum(0)
-            hratio.SetMaximum(4)
+        if len(histograms[name]) != 2 : continue
 
-            yax = hratio.GetYaxis()
-            xax = hratio.GetXaxis()
-            yax.SetTitle("Extras enabled / default")
-            yax.SetTitleOffset(1.5)
+        hratio = histograms[name][1].Clone("ratio_%s" % histograms[name][0].GetName())
+        hratio.Divide(histograms[name][0])
+        nbins = hratio.GetNbinsX()
+        hratio.SetLineColor(colors[1])
+        hratio.SetMinimum(0)
+        hratio.SetMaximum(3)
 
-            hratio.Draw("hist")
-            c.canvas.Update()
+        yax = hratio.GetYaxis()
+        xax = hratio.GetXaxis()
+        yax.SetTitle("Extras enabled / default")
+        yax.SetTitleSize(2 * yax.GetTitleSize())
+        yax.SetTitleOffset(0.7)
+        yax.SetLabelSize(2 * yax.GetLabelSize())
+        xax.SetTitleOffset(1.5)
+        xax.SetTitleSize(3 * xax.GetTitleSize())
+        xax.SetLabelSize(2*xax.GetLabelSize())
+        xax.SetLabelOffset(0.05)
+
+        hratio.Draw("hist e")
+        #c.lower_pad.Update()
+        c.canvas.Update()
             
-
         c.canvas.SaveAs("./plots/ratio_%s.pdf" % name)
             
 
