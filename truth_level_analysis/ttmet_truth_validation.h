@@ -33,6 +33,7 @@ class TtMetTruthValidation : public TruthSelectorBase
         void setup_histograms();
 
         bool process_stop_decays();
+        bool process_final_state();
 
     private :
 
