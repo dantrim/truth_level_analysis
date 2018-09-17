@@ -128,6 +128,7 @@ void TruthSelectorBase::add_histogram(truth::Histo desc)
         }
         else {
             TH1D* h = new TH1D( desc.name.c_str(), desc.title.c_str(), desc.nbinsX, desc.lowX, desc.highX );
+            h->Sumw2();
             m_histo_map1D[desc.name] = h;
             m_loaded_histos.push_back(desc.name);
         }

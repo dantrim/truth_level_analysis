@@ -59,28 +59,28 @@ void TtMetTruthValidation::setup_output()
 
 void TtMetTruthValidation::setup_histograms()
 {
-    add_histogram(Histo("h_wPt", ";W boson p_{T} [GeV]", 100, 0, -1));
-    add_histogram(Histo("h_wPt_children", ";(l+#nu) p_{T} [GeV]", 100, 0, -1));
-    add_histogram(Histo("h_wMass", ";W boson mass [GeV]", 100, 0, -1));
-    add_histogram(Histo("h_wMass_children", ";(l+#nu) mass [GeV]", 100, 0, -1));
+    add_histogram(Histo("h_wPt", ";W boson p_{T} [GeV]", 100, 0, 250));
+    add_histogram(Histo("h_wPt_children", ";(l+#nu) p_{T} [GeV]", 100, 0, 250));
+    add_histogram(Histo("h_wMass", ";W boson mass [GeV]", 60, 40, 100));
+    add_histogram(Histo("h_wMass_children", ";(l+#nu) mass [GeV]", 60, 40, 100));
 
     // stop pair stuff
-    add_histogram(Histo("h_st0_pT", ";#tilde{t} p_{T} 0 [GeV]", 100, 0, -1));
-    add_histogram(Histo("h_st1_pT", ";#tilde{t} p_{T} 1 [GeV]", 100, 0, -1));
+    add_histogram(Histo("h_st0_pT", ";#tilde{t} p_{T} 0 [GeV]", 100, 0, 1000));
+    add_histogram(Histo("h_st1_pT", ";#tilde{t} p_{T} 1 [GeV]", 100, 0, 1000));
     add_histogram(Histo("h_st0_m", ";#tilde{t} 0 mass [GeV]", 100, 0, -1));
     add_histogram(Histo("h_st1_m", ";#tilde{t} 1 mass [GeV]", 100, 0, -1));
 
-    add_histogram(Histo("h_n10_pT", ";#tilde{#chi}_{1}^{0} 0 p_{T} [GeV]", 100, 0, -1));
-    add_histogram(Histo("h_n11_pT", ";#tilde{#chi}_{1}^{0} 1 p_{T} [GeV]", 100, 0, -1));
+    add_histogram(Histo("h_n10_pT", ";#tilde{#chi}_{1}^{0} 0 p_{T} [GeV]", 100, 0, 800));
+    add_histogram(Histo("h_n11_pT", ";#tilde{#chi}_{1}^{0} 1 p_{T} [GeV]", 100, 0, 800));
     add_histogram(Histo("h_n10_m", ";#tilde{#chi}_{1}^{0} 0 mass [GeV]", 100, 0, -1));
     add_histogram(Histo("h_n11_m", ";#tilde{#chi}_{1}^{0} 1 mass [GeV]", 100, 0, -1));
 
-    add_histogram(Histo("h_stst_pT", ";p_{T}^{#tilde{t} #tilde{t}} [GeV]", 100, 0, -1));
-    add_histogram(Histo("h_stst_m", ";m_{#tilde{t} #tilde{t}} [GeV]", 100, 0, -1));
-    add_histogram(Histo("h_n1n1_pT", ";p_{T}^{#tilde{#chi} #tilde{#chi}} [GeV]", 100, 0, -1));
-    add_histogram(Histo("h_n1n1_m", ";m_{#tilde{#chi} #tilde{#chi}} [GeV]", 100, 0, -1));
-    add_histogram(Histo("h_dphi_stst", ";#Delta #phi_{#tilde{t} #tilde{t}}", 100, 0, -1));
-    add_histogram(Histo("h_dphi_n1n1", ";#Delta #phi_{#tilde{#chi} #tilde{#chi}}", 100, 0, -1));
+    add_histogram(Histo("h_stst_pT", ";p_{T}^{#tilde{t} #tilde{t}} [GeV]", 50, 0, 600));
+    add_histogram(Histo("h_stst_m", ";m_{#tilde{t} #tilde{t}} [GeV]", 50, 0, 2000));
+    add_histogram(Histo("h_n1n1_pT", ";p_{T}^{#tilde{#chi} #tilde{#chi}} [GeV]", 50, 0, 300));
+    add_histogram(Histo("h_n1n1_m", ";m_{#tilde{#chi} #tilde{#chi}} [GeV]", 50, 0, 1500));
+    add_histogram(Histo("h_dphi_stst", ";#Delta #phi_{#tilde{t} #tilde{t}}", 35, -3.5, 3.5));
+    add_histogram(Histo("h_dphi_n1n1", ";#Delta #phi_{#tilde{#chi} #tilde{#chi}}", 35, -3.5, 3.5));
 
     add_histogram(Histo("h_top0_m", ";t-quark 0 mass [GeV]", 100, 0, -1));
     add_histogram(Histo("h_top1_m", ";t-quark 1 mass [GeV]", 100, 0, -1));
@@ -88,33 +88,33 @@ void TtMetTruthValidation::setup_histograms()
     add_histogram(Histo("h_b0_pT", ";b-quark 0 p_{T} [GeV]", 100, 0, -1));
     add_histogram(Histo("h_b1_pT", ";b-quark 1 p_{T} [GeV]", 100, 0, -1));
 
-    add_histogram(Histo("h_wb0_pT", ";W+b 0 (l+#nu+b) p_{T} [GeV]", 100, 0, -1));
-    add_histogram(Histo("h_wb0_m", ";W+b 0 mass (l+#nu+b) mass [GeV]", 100, 0, -1));
-    add_histogram(Histo("h_cosThetal0", ";cos #theta_l 0", 100, 0, -1));
-    add_histogram(Histo("h_wb1_pT", ";W+b 1 (l+#nu+b) p_{T} [GeV]", 100, 0, -1));
-    add_histogram(Histo("h_wb1_m", ";W+b 1 mass (l+#nu+b) mass [GeV]", 100, 0, -1));
-    add_histogram(Histo("h_cosThetal1", ";cos #theta_l 1", 100, 0, -1));
+    add_histogram(Histo("h_wb0_pT", ";W+b 0 (l+#nu+b) p_{T} [GeV]", 50, 0, 300));
+    add_histogram(Histo("h_wb0_m", ";W+b 0 mass (l+#nu+b) mass [GeV]", 40, 60, 100));
+    add_histogram(Histo("h_cosThetal0", ";cos #theta_l 0", 20, -1.1, 1.1));
+    add_histogram(Histo("h_wb1_pT", ";W+b 1 (l+#nu+b) p_{T} [GeV]", 50, 0, 300));
+    add_histogram(Histo("h_wb1_m", ";W+b 1 mass (l+#nu+b) mass [GeV]", 40, 60, 100));
+    add_histogram(Histo("h_cosThetal1", ";cos #theta_l 1", 20, -1.1, 1.1));
 
     // "final state"
-    add_histogram(Histo("h_fs_met", ";Missing Transverse Momentum (Non-Int) [GeV]", 100, 0, -1));
-    add_histogram(Histo("h_fs_l0_pT", ";Lead lepton p_{T} [GeV]", 100, 0, -1));
-    add_histogram(Histo("h_fs_l1_pT", ";Sub-lead lepton p_{T} [GeV]", 100, 0, -1));
-    add_histogram(Histo("h_fs_pTll", ";p_{T}^{ll} [GeV]", 100, 0, -1));
-    add_histogram(Histo("h_fs_dphi_ll", ";#Delta #phi_{ll}", 100, 0, -1));
-    add_histogram(Histo("h_fs_dphi_met_ll", ";#Delta #phi(MET,ll)", 100, 0, -1));
+    add_histogram(Histo("h_fs_met", ";Missing Transverse Momentum (Non-Int) [GeV]", 25, 0, 500));
+    add_histogram(Histo("h_fs_l0_pT", ";Lead lepton p_{T} [GeV]", 40, 0, 200));
+    add_histogram(Histo("h_fs_l1_pT", ";Sub-lead lepton p_{T} [GeV]", 40, 0, 200));
+    add_histogram(Histo("h_fs_pTll", ";p_{T}^{ll} [GeV]", 40, 0, 200));
+    add_histogram(Histo("h_fs_dphi_ll", ";#Delta #phi_{ll}", 35, -3.5, 3.5));
+    add_histogram(Histo("h_fs_dphi_met_ll", ";#Delta #phi(MET,ll)", 35, -3.5, 3.5));
 
-    add_histogram(Histo("h_fs_nJets", ";Jet multiplicity", 20, 0, 20));
-    add_histogram(Histo("h_fs_nBJets", ";Truth b-Jet multiplicity", 10, 0, 10));
+    add_histogram(Histo("h_fs_nJets", ";Jet multiplicity", 15, 0, 15));
+    add_histogram(Histo("h_fs_nBJets", ";Truth b-Jet multiplicity", 6, 0, 6));
     add_histogram(Histo("h_fs_nSJets", ";Truth non-b-Jet multiplicity", 15, 0, 15));
-    add_histogram(Histo("h_fs_j0_pT", ";Lead jet p_{T} [GeV]", 100, 0, -1));
-    add_histogram(Histo("h_fs_j1_pT", ";Sub-lead jet p_{T} [GeV]", 100, 0, -1));
-    add_histogram(Histo("h_fs_bj0_pT", ";Lead b-jet p_{T} [GeV]", 100, 0, -1));
-    add_histogram(Histo("h_fs_bj1_pT", ";Sub-lead b-jet p_{T} [GeV]", 100, 0, -1));
+    add_histogram(Histo("h_fs_j0_pT", ";Lead jet p_{T} [GeV]", 25, 0, 500));
+    add_histogram(Histo("h_fs_j1_pT", ";Sub-lead jet p_{T} [GeV]", 20, 0, 300));
+    add_histogram(Histo("h_fs_bj0_pT", ";Lead b-jet p_{T} [GeV]", 20, 0, 80));
+    add_histogram(Histo("h_fs_bj1_pT", ";Sub-lead b-jet p_{T} [GeV]", 20, 0, 80));
 
-    add_histogram(Histo("h_fs_dphi_l0_j0", ";#Delta #phi(lead-lep, lead-jet)", 100, 0, -1));
-    add_histogram(Histo("h_fs_dphi_l0_bj0", ";#Delta #phi(lead-lep, lead b-jet)", 100, 0, -1));
-    add_histogram(Histo("h_fs_dphi_ll_j0", ";#Delta #phi(ll, lead-jet)", 100, 0, -1));
-    add_histogram(Histo("h_fs_dphi_ll_bj0", ";#Delta #phi(ll, lead b-jet)", 100, 0, -1));
+    add_histogram(Histo("h_fs_dphi_l0_j0", ";#Delta #phi(lead-lep, lead-jet)", 35, -3.5, 3.5));
+    add_histogram(Histo("h_fs_dphi_l0_bj0", ";#Delta #phi(lead-lep, lead b-jet)", 35, -3.5, 3.5));
+    add_histogram(Histo("h_fs_dphi_ll_j0", ";#Delta #phi(ll, lead-jet)", 35, -3.5, 3.5));
+    add_histogram(Histo("h_fs_dphi_ll_bj0", ";#Delta #phi(ll, lead b-jet)", 35, -3.5, 3.5));
 }
 
 Bool_t TtMetTruthValidation::Process(Long64_t entry)

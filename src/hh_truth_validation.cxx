@@ -374,7 +374,8 @@ bool HHTruthValidation::process_final_state()
     RETURN_CHECK(GetName(), event()->retrieve(truthMuons, "TruthMuons"));
 
     const xAOD::JetContainer* truthJets = 0;
-    RETURN_CHECK(GetName(), event()->retrieve(truthJets, "AntiKt4TruthDressedWZJets"));
+    //RETURN_CHECK(GetName(), event()->retrieve(truthJets, "AntiKt4TruthDressedWZJets"));
+    RETURN_CHECK(GetName(), event()->retrieve(truthJets, "AntiKt4TruthWZJets"));
 
     const xAOD::MissingETContainer* met = 0;
     RETURN_CHECK(GetName(), event()->retrieve(met, "MET_Truth" ));
