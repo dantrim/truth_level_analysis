@@ -9,6 +9,7 @@
 
 //ROOT
 class TBranch;
+#include "TLorentzVector.h"
 
 namespace truth
 {
@@ -43,8 +44,14 @@ class TruthNtupler : public TruthSelectorBase
         bool update_sumw();
         bool process_event();
         void reset_ttree_vars();
-        void var(std::string, int val);
-        void var(std::string, float val);
+        void ivar(std::string, int val);
+        void fvar(std::string, float val);
+        bool is_bjet(const xAOD::Jet* jet);
+
+        // output
+        void fill_ntuple(std::vector<const xAOD::TruthParticle*> leptons,
+            std::vector<const xAOD::Jet*> jets, std::vector<const xAOD::Jet*> sjets,
+            std::vector<const xAOD::Jet*> bjets, TLorentzVector met);
 
         // analysis
         double w() { return ((m_mc_weight * m_xsec * (m_lumi * 1000.)) / m_sumw); }
