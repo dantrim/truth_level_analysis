@@ -28,6 +28,10 @@ using namespace std;
 //xAOD
 #include "PathResolver/PathResolver.h"
 
+//lwtnn
+#include "lwtnn/LightweightGraph.hh"
+#include "lwtnn/parse_json.hh"
+
 #define FBRANCH(name) \
     do { \
         output_tree()->Branch(#name, &m_float_vm[#name]); \
@@ -45,7 +49,9 @@ TruthNtupler::TruthNtupler() :
     m_do_sumw(false),
     m_dsid(0),
     m_xsec(-1.0),
-    m_sumw(-1.0)
+    m_sumw(-1.0),
+    m_total_sumw(0.0),
+    m_lwt_graph(nullptr)
 {
 }
 
@@ -58,7 +64,7 @@ void TruthNtupler::Terminate()
 {
     if(do_sumw()) {
         cout << MYFUNC << " ===================================" << endl;
-        cout << MYFUNC << "  Total sumw: " << m_sumw << endl;
+        cout << MYFUNC << "  Total sumw: " << m_total_sumw << endl;
         cout << MYFUNC << " ===================================" << endl;
     }
     TruthSelectorBase::Terminate();
@@ -154,12 +160,16 @@ void TruthNtupler::setup_output()
     // di-bjet system
     FBRANCH(mbb)
     FBRANCH(dRbb)
+    FBRANCH(dR_ll_bb)
     FBRANCH(dphi_bb)
     FBRANCH(pTbb)
+    FBRANCH(mT_bb)
 
     // leptons + di-bjet system
-    FBRANCH(dr_llbb)
-    FBRANCH(dphi_llbb)
+    FBRANCH(dR_ll_bb)
+    FBRANCH(dphi_ll_bb)
+    FBRANCH(dphi_j0_ll) 
+    FBRANCH(dphi_j0_l0)
     FBRANCH(dphi_bj0_ll)
     FBRANCH(dphi_bj0_l0)
     FBRANCH(dr_bj0_l0)
@@ -174,7 +184,15 @@ void TruthNtupler::setup_output()
     FBRANCH(MT_1)
     FBRANCH(MT_1_scaled)
 
-
+    // NN VAR
+    FBRANCH(NN_p_hh)
+    FBRANCH(NN_p_tt)
+    FBRANCH(NN_p_wt)
+    FBRANCH(NN_p_zjets)
+    FBRANCH(NN_d_hh)
+    FBRANCH(NN_d_tt)
+    FBRANCH(NN_d_wt)
+    FBRANCH(NN_d_zjets)
     
 }
 
@@ -313,6 +331,55 @@ void TruthNtupler::load_sumw_and_xsec()
 
 }
 
+void TruthNtupler::load_lwtnn()
+{
+    cout << MYFUNC << " Starting to load NN" << endl;
+
+    string network_dir = "/data/uclhc/uci/user/dantrim/n0234val/my_networks/";
+    string nn_file = network_dir + "nn_descriptor_nombbmt2_1k.json";
+
+    std::ifstream input_nn_file(nn_file);
+    if(!input_nn_file.good()) {
+        cout << MYFUNC << " ERROR: Could not find/open NN file (=" << nn_file << ")" << endl;
+        exit(1);
+    }
+    string output_layer_name = "OutputLayer";
+    auto config = lwt::parse_json_graph(input_nn_file);
+    m_lwt_graph = new lwt::LightweightGraph(config, output_layer_name);
+
+    cout << MYFUNC << " Finished loading NN" << endl;
+    lwt_var_means["j0_pt"] = 134.898;
+    lwt_var_means["j1_pt"] = 69.5677;
+    lwt_var_means["bj0_pt"] = 122.180;
+    lwt_var_means["bj1_pt"] = 54.1126;
+    lwt_var_means["j0_eta"] = 0.0035159;
+    lwt_var_means["j1_eta"] = -0.0014209;
+    lwt_var_means["bj0_eta"] = -0.005168;
+    lwt_var_means["bj1_eta"] = 0.00638;
+    lwt_var_means["j0_phi"] = 0.0146455;
+    lwt_var_means["j1_phi"] = 0.0051678;
+    lwt_var_means["bj0_phi"] = 0.013698;
+    lwt_var_means["bj1_phi"] = 0.011199;
+    lwt_var_means["dphi_j0_ll"] = 0.0058626;
+    lwt_var_means["dphi_j0_l0"] = -0.0030659;
+    lwt_var_means["dphi_bj0_ll"] = 0.0086884;
+    lwt_var_means["dphi_bj0_l0"] = -0.0016912;
+    lwt_var_means["mbb"] = 144.59769;
+    lwt_var_means["dRbb"] = 2.130620;
+    lwt_var_means["dR_ll_bb"] = 2.815526;
+    lwt_var_means["dphi_ll_bb"] = 0.00045855;
+    lwt_var_means["dphi_WW_bb"] = -0.0093672;
+    lwt_var_means["HT2"] = 279.0936;
+    lwt_var_means["HT2Ratio"] = 0.63980;
+    lwt_var_means["MT_1"] = 478.057;
+    lwt_var_means["MT_1_scaled"] = 470.3389;
+    lwt_var_means["mt2_llbb"] = 172.9586;
+    lwt_var_means["mt2_bb"] = 66.25853;
+    lwt_var_means["dphi_bb"] = -0.003595;
+    lwt_var_means["mT_bb"] = 144.5976;
+
+}
+
 bool TruthNtupler::is_bjet(const xAOD::Jet* jet)
 {
     int flavor = 0;
@@ -348,6 +415,7 @@ Bool_t TruthNtupler::Process(Long64_t entry)
     if(chain_entry == 0) {
         if(!do_sumw()) {
             load_sumw_and_xsec();
+            load_lwtnn();
             setup_output();
         }
     }
@@ -374,13 +442,23 @@ bool TruthNtupler::update_sumw()
 {
     const xAOD::EventInfo* ei = 0;
     RETURN_CHECK(GetName(), event()->retrieve(ei, "EventInfo"));
-    m_sumw += ei->mcEventWeight();
+    m_total_sumw += ei->mcEventWeight();
 
     return true;
 }
 
 bool TruthNtupler::process_event()
 {
+    const xAOD::EventInfo* ei = 0;
+    RETURN_CHECK(GetName(), event()->retrieve(ei, "EventInfo"));
+    mc_weight(ei->mcEventWeight());
+
+    // event level stuff
+    ivar("dsid", dsid());
+    fvar("eventweight", w());
+    fvar("w", mc_weight());
+    fvar("sumw", m_sumw);
+
     // get the jets
     vector<const xAOD::Jet*> jets;
     const xAOD::JetContainer* xjets = 0;
@@ -495,6 +573,23 @@ bool TruthNtupler::process_event()
     return true;
 }
 
+std::map<std::string, double> TruthNtupler::lwt_input_map()
+{
+    std::map<string, double> inputs;
+    for(auto m : m_float_vm) {
+        string name = m.first;
+        double value = static_cast<double>(m.second);
+        inputs[name] = value;
+    }
+    for(auto m : m_int_vm) {
+        string name = m.first;
+        double value = static_cast<double>(m.second);
+        inputs[name] = value;
+    }
+
+    return inputs;
+}
+
 void TruthNtupler::fill_ntuple(vector<const xAOD::TruthParticle*> leptons,
     vector<const xAOD::Jet*> jets, vector<const xAOD::Jet*> sjets, vector<const xAOD::Jet*> bjets,
     TLorentzVector met)
@@ -550,6 +645,8 @@ void TruthNtupler::fill_ntuple(vector<const xAOD::TruthParticle*> leptons,
         fvar("j0_pt", jets.at(0)->pt() * mev2gev);
         fvar("j0_eta", jets.at(0)->eta());
         fvar("j0_phi", jets.at(0)->phi());
+        fvar("dphi_j0_ll", jets.at(0)->p4().DeltaPhi(leptons.at(0)->p4() + leptons.at(1)->p4()));
+        fvar("dphi_j0_l0", jets.at(0)->p4().DeltaPhi(leptons.at(0)->p4()));
     }
     if(nJets>1) {
         fvar("j1_pt", jets.at(1)->pt() * mev2gev);
@@ -606,12 +703,14 @@ void TruthNtupler::fill_ntuple(vector<const xAOD::TruthParticle*> leptons,
     if(nBJets>1) {
         fvar("mbb", (bjets.at(0)->p4() + bjets.at(1)->p4()).M() * mev2gev);
         fvar("dRbb", (bjets.at(0)->p4().DeltaR(bjets.at(1)->p4())));
+        fvar("dR_ll_bb", (bjets.at(0)->p4()+bjets.at(1)->p4()).DeltaR(leptons.at(0)->p4() + leptons.at(1)->p4()));
         fvar("dphi_bb", (bjets.at(0)->p4().DeltaPhi(bjets.at(1)->p4())));
         fvar("pTbb", (bjets.at(0)->p4() + bjets.at(1)->p4()).Pt() * mev2gev);
 
-        fvar("dr_llbb", (leptons.at(0)->p4()+leptons.at(1)->p4()).DeltaR((bjets.at(0)->p4()+bjets.at(1)->p4())));
-        fvar("dphi_llbb", (leptons.at(0)->p4()+leptons.at(1)->p4()).DeltaPhi((bjets.at(0)->p4()+bjets.at(1)->p4())));
+        fvar("dR_ll_bb", (leptons.at(0)->p4()+leptons.at(1)->p4()).DeltaR((bjets.at(0)->p4()+bjets.at(1)->p4())));
+        fvar("dphi_ll_bb", (leptons.at(0)->p4()+leptons.at(1)->p4()).DeltaPhi((bjets.at(0)->p4()+bjets.at(1)->p4())));
         fvar("dphi_llmet_bb", (leptons.at(0)->p4() + leptons.at(1)->p4() + met).DeltaPhi(bjets.at(0)->p4() + bjets.at(1)->p4()));
+        fvar("mT_bb", (bjets.at(0)->p4()+bjets.at(1)->p4()).Mt() * mev2gev);
         
     }
     if(nBJets>0) {
@@ -659,6 +758,69 @@ void TruthNtupler::fill_ntuple(vector<const xAOD::TruthParticle*> leptons,
         y = (vis_system + met).Pt();
         fvar("MT_1_scaled", sqrt( (x*x) - (y*y) ) * mev2gev);
     }
+
+    // LWT VARS
+    auto inputs = lwt_input_map();
+    // set the means accordingly
+    if(!(nJets>0)) {
+        inputs.at("j0_pt") = lwt_var_means.at("j0_pt");
+        inputs.at("j0_phi") = lwt_var_means.at("j0_phi");
+        inputs.at("j0_eta") = lwt_var_means.at("j0_eta");
+        inputs.at("dphi_j0_ll") = lwt_var_means.at("dphi_j0_ll");
+        inputs.at("dphi_j0_l0") = lwt_var_means.at("dphi_j0_l0");
+    }
+    if(!(nJets>1)) {
+        inputs.at("j1_pt") = lwt_var_means.at("j1_pt");
+        inputs.at("j1_eta") = lwt_var_means.at("j1_eta");
+        inputs.at("j1_phi") = lwt_var_means.at("j1_phi");
+    }
+    if(!(nBJets>0)) {
+        inputs.at("bj0_pt") = lwt_var_means.at("bj0_pt");
+        inputs.at("bj0_eta") = lwt_var_means.at("bj0_eta");
+        inputs.at("bj0_phi") = lwt_var_means.at("bj0_phi");
+        inputs.at("dphi_bj0_ll") = lwt_var_means.at("dphi_bj0_ll");
+        inputs.at("dphi_bj0_l0") = lwt_var_means.at("dphi_bj0_l0");
+    }
+    if(!(nBJets>1)) {
+        inputs.at("bj1_pt") = lwt_var_means.at("bj1_pt");
+        inputs.at("bj1_eta") = lwt_var_means.at("bj1_eta");
+        inputs.at("bj1_phi") = lwt_var_means.at("bj1_phi");
+
+        inputs.at("mbb") = lwt_var_means.at("mbb");
+        inputs.at("dRbb") = lwt_var_means.at("dRbb");
+        inputs.at("dR_ll_bb") = lwt_var_means.at("dR_ll_bb");
+        inputs.at("dphi_ll_bb") = lwt_var_means.at("dphi_ll_bb");
+//        inputs.at("dphi_WW_bb") = lwt_var_means.at("dphi_WW_bb");
+        inputs.at("HT2") = lwt_var_means.at("HT2");
+        inputs.at("HT2Ratio") = lwt_var_means.at("HT2Ratio");
+        inputs.at("MT_1") = lwt_var_means.at("MT_1");
+        inputs.at("MT_1_scaled") = lwt_var_means.at("MT_1_scaled");
+        inputs.at("mt2_llbb") = lwt_var_means.at("mt2_llbb");
+        inputs.at("mt2_bb") = lwt_var_means.at("mt2_bb");
+        inputs.at("dphi_bb") = lwt_var_means.at("dphi_bb");
+        inputs.at("mT_bb") = lwt_var_means.at("mT_bb");
+    }
+    lwt_inputs["InputLayer"] = inputs;
+    auto output_scores = lwt_graph()->compute(lwt_inputs);
+    double p_hh = output_scores.at("out_0_hh");
+    double p_tt = output_scores.at("out_1_tt");
+    double p_wt = output_scores.at("out_2_wt");
+    double p_z = output_scores.at("out_3_zjets");
+
+    fvar("NN_p_hh", p_hh);
+    fvar("NN_p_tt", p_tt);
+    fvar("NN_p_wt", p_wt);
+    fvar("NN_p_zjets", p_z);
+
+    double d_hh = log( p_hh / (p_tt + p_wt + p_z) );
+    double d_tt = log( p_tt / (p_hh + p_wt + p_z) );
+    double d_wt = log( p_wt / (p_tt + p_hh + p_z) );
+    double d_z = log( p_z / (p_tt + p_hh + p_wt) );
+
+    fvar("NN_d_hh", d_hh);
+    fvar("NN_d_tt", d_tt);
+    fvar("NN_d_wt", d_wt);
+    fvar("NN_d_zjets", d_z);
 
 }
 

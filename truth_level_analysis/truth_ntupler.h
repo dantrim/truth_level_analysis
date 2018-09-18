@@ -11,6 +11,11 @@
 class TBranch;
 #include "TLorentzVector.h"
 
+//lwtnn
+namespace lwt {
+    class LightweightGraph;
+}
+
 namespace truth
 {
 
@@ -41,6 +46,7 @@ class TruthNtupler : public TruthSelectorBase
 
         // flow
         void load_sumw_and_xsec();
+        void load_lwtnn();
         bool update_sumw();
         bool process_event();
         void reset_ttree_vars();
@@ -56,6 +62,10 @@ class TruthNtupler : public TruthSelectorBase
         // analysis
         double w() { return ((m_mc_weight * m_xsec * (m_lumi * 1000.)) / m_sumw); }
 
+        // LWTNN
+        lwt::LightweightGraph* lwt_graph() { return m_lwt_graph; }
+        std::map<std::string, double> lwt_input_map();
+
     private :
 
         bool m_do_sumw;
@@ -64,6 +74,7 @@ class TruthNtupler : public TruthSelectorBase
         double m_xsec;
         double m_lumi; // in [1/fb]
         double m_sumw;
+        double m_total_sumw;
 
         std::map<int, double> m_sumw_map;
         std::map<int, double> m_xsec_map;
@@ -71,6 +82,11 @@ class TruthNtupler : public TruthSelectorBase
         // OUTPUT NTUPLE
         std::map<std::string, float> m_float_vm;
         std::map<std::string, int> m_int_vm;
+
+        // LWTNN
+        lwt::LightweightGraph* m_lwt_graph;
+        std::map<std::string, float> lwt_var_means;
+        std::map< std::string, std::map<std::string, double>> lwt_inputs;
 
 }; // class TruthNtupler
 

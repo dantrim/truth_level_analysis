@@ -1,5 +1,7 @@
 atlas_subdir( truth_level_analysis )
 
+find_package(lwtnn)
+
 atlas_depends_on_subdirs(
     PUBLIC
     Event/xAOD/xAODBase
@@ -17,8 +19,8 @@ find_package( ROOT REQUIRED COMPONENTS RIO Hist Tree Core Gpad Graf Graf3d )
 set(_common
     src/*.cxx
     src/utility/*.cxx
-    INCLUDE_DIRS ${ROOT_INCLUDE_DIRS} truth_level_analysis truth_level_analysis/utility
-    LINK_LIBRARIES ${ROOT_LIBRARIES}
+    INCLUDE_DIRS ${ROOT_INCLUDE_DIRS} truth_level_analysis truth_level_analysis/utility ${LWTNN_INCLUDE_DIRS}
+    LINK_LIBRARIES ${ROOT_LIBRARIES} ${LWTNN_LIBRARIES}
     xAODRootAccess
     xAODJet
     xAODTruth
