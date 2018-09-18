@@ -67,6 +67,11 @@ bool Susy::utils::endswith(const std::string &str, const std::string &ending) {
     else return (0==str.compare(str.length() - ending.length(), ending.length(), ending));
 }
 //----------------------------------------------------------
+bool Susy::utils::startswith(const std::string &str, const std::string &starting) {
+    if(str.length()<starting.length()) return false;
+    else return (0==str.compare(0, starting.length(), starting));
+}
+//----------------------------------------------------------
 std::vector< std::string > Susy::utils::tokenizeString(const std::string &inputString, char separator)
 {
   vector<string> tokens;

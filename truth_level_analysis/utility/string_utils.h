@@ -31,6 +31,8 @@ std::string tab2space(std::string str);
 bool contains(const std::string &str, const std::string &substr);
 /// whether str ends with ending
 bool endswith(const std::string &str, const std::string &ending);
+/// whether str starts with beginning
+bool startswith(const std::string &str, const std::string &ending);
 /// split inputString in a vector of tokens
 std::vector< std::string > tokenizeString(const std::string &inputString, char separator);
 /// convert a string to a double

@@ -9,6 +9,7 @@ atlas_depends_on_subdirs(
     Event/xAOD/xAODMissingET
     Event/xAOD/xAODJet
     PhysicsAnalysis/MCTruthClassifier
+    Tools/PathResolver
 )
 
 find_package( ROOT REQUIRED COMPONENTS RIO Hist Tree Core Gpad Graf Graf3d )
@@ -23,6 +24,7 @@ set(_common
     xAODTruth
     xAODEventInfo
     xAODMissingET
+    PathResolver
 )
 
 
@@ -36,3 +38,6 @@ file(GLOB files "util/*.cxx")
 foreach(file ${files})
     MakeExec(${file})
 endforeach()
+
+# locate data/ dir to be picked up by PathResolver
+atlas_install_data( data/* )

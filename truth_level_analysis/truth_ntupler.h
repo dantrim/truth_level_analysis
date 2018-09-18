@@ -35,9 +35,13 @@ class TruthNtupler : public TruthSelectorBase
 
         // misc
         void setup_output();
+        std::map<int, double> & sumw_map() { return m_sumw_map; }
+        std::map<int, double> & xsec_map() { return m_xsec_map; }
 
         // flow
+        void load_sumw_and_xsec();
         bool update_sumw();
+        bool process_event();
         void reset_ttree_vars();
         void var(std::string, int val);
         void var(std::string, float val);
@@ -54,12 +58,12 @@ class TruthNtupler : public TruthSelectorBase
         double m_lumi; // in [1/fb]
         double m_sumw;
 
+        std::map<int, double> m_sumw_map;
+        std::map<int, double> m_xsec_map;
+
         // OUTPUT NTUPLE
         std::map<std::string, float> m_float_vm;
         std::map<std::string, int> m_int_vm;
-
-        TBranch* b_nBJets;
-        TBranch* b_l0_pt;
 
 }; // class TruthNtupler
 
